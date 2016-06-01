@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         my = (MyWidgetView) findViewById(R.id.my);
         my.setmData(new String[]{"XXS","XS","S","M","L","XL","XXL","XXXL"});
+
         findViewById(R.id.last).setOnClickListener(this);
         findViewById(R.id.next).setOnClickListener(this);
         findViewById(R.id.moveto).setOnClickListener(this);

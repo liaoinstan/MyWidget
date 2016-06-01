@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,6 +14,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.OverScroller;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.liaoinstan.mylinearlayout.R;
@@ -89,7 +91,6 @@ public class MyWidgetView extends ViewGroup implements View.OnClickListener{
                 measureChild(child, widthMeasureSpec, heightMeasureSpec);
             }
         }
-
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -109,6 +110,17 @@ public class MyWidgetView extends ViewGroup implements View.OnClickListener{
         moveTo(firstPosition, false);
     }
 
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        View child = getChildAt(MAX_NUM/2);
+        int offset = getScrollX();
+        if (child != null) {
+            //绘制圆形背景
+            canvas.drawCircle(child.getLeft() + child.getWidth() / 2 + offset, child.getTop() + child.getHeight() / 2, child.getWidth() / 2, paint);
+        }
+        super.dispatchDraw(canvas);
+    }
+
     /**
      * 事件分发：判断是点击事件还是移动事件，分发给不同的对象处理
      * @param event
@@ -116,17 +128,15 @@ public class MyWidgetView extends ViewGroup implements View.OnClickListener{
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        dealMulTouchEvent(event);
         int action = event.getAction();
         int x = (int) event.getX();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mFirstX = x;
-                mLastX = x;
                 needMyMove = false;
                 break;
             case MotionEvent.ACTION_MOVE:
-                dx = x - mLastX;
-                mLastX = x;
                 //移动距离大于系统预设值，则代表是move事件，不是点击
                 if (Math.abs(x-mFirstX)>=mTouchSlop){
                     needMyMove = true;
@@ -230,6 +240,54 @@ public class MyWidgetView extends ViewGroup implements View.OnClickListener{
     }
 
     /**
+     * 处理多点触控的情况，准确地计算Y坐标和移动距离dy
+     * 同时兼容单点触控的情况
+     */
+    private int mActivePointerId = MotionEvent.INVALID_POINTER_ID;
+    public void dealMulTouchEvent(MotionEvent ev) {
+        final int action = MotionEventCompat.getActionMasked(ev);
+        switch (action) {
+            case MotionEvent.ACTION_DOWN: {
+                final int pointerIndex = MotionEventCompat.getActionIndex(ev);
+                final float x = MotionEventCompat.getX(ev, pointerIndex);
+                mLastX = (int) x;
+                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                break;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+                final float x = MotionEventCompat.getX(ev, pointerIndex);
+                dx = (int) (x - mLastX);
+                mLastX = (int) x;
+                break;
+            }
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mActivePointerId = MotionEvent.INVALID_POINTER_ID;
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN: {
+                final int pointerIndex = MotionEventCompat.getActionIndex(ev);
+                final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+                if (pointerId != mActivePointerId) {
+                    mLastX = (int) MotionEventCompat.getX(ev, pointerIndex);
+                    mActivePointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+                }
+                break;
+            }
+            case MotionEvent.ACTION_POINTER_UP: {
+                final int pointerIndex = MotionEventCompat.getActionIndex(ev);
+                final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+                if (pointerId == mActivePointerId) {
+                    final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+                    mLastX = (int) MotionEventCompat.getX(ev, newPointerIndex);
+                    mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+                }
+                break;
+            }
+        }
+    }
+
+    /**
      * 根据坐标计算中心位置的是哪一个view
      */
     private int getCurrentPosition(){
@@ -255,17 +313,6 @@ public class MyWidgetView extends ViewGroup implements View.OnClickListener{
     private boolean isOverRight(){
         int pernow = getScrollX()/childSpaceWidth;
         return !(pernow < mData.length - MAX_NUM/2-1);
-    }
-
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        View child = getChildAt(MAX_NUM/2);
-        int offset = getScrollX();
-        if (child != null) {
-            //绘制圆形背景
-            canvas.drawCircle(child.getLeft() + child.getWidth() / 2 + offset, child.getTop() + child.getHeight() / 2, child.getWidth() / 2, paint);
-        }
-        super.dispatchDraw(canvas);
     }
 
     @Override
