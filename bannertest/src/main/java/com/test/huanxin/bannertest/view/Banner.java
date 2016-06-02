@@ -54,7 +54,7 @@ public class Banner extends FrameLayout implements Runnable{
 
     private GradientDrawable mUnSelectedGradientDrawable;
     private GradientDrawable mSelectedGradientDrawable;
-    private int dot_size = 15;
+    private int dot_size = 13;
 
     public Banner(Context context, AttributeSet attrs) {
         super(context, attrs);

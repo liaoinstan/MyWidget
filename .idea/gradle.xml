@@ -8,7 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Mylinearlayout" />
+            <option value="$PROJECT_DIR$/MyWidgetView" />
             <option value="$PROJECT_DIR$/Testmulttouch" />
             <option value="$PROJECT_DIR$/bannertest" />
           </set>
@@ -16,7 +16,7 @@
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Mylinearlayout" />
+            <option value="$PROJECT_DIR$/MyWidgetView" />
             <option value="$PROJECT_DIR$/Testmulttouch" />
             <option value="$PROJECT_DIR$/bannertest" />
           </set>
