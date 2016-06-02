@@ -1,1 +1,1 @@
-include ':Mylinearlayout'
+include ':Mylinearlayout', ':Testmulttouch', ':bannertest'

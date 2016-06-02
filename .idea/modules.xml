@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/3MyLinearLayout.iml" filepath="$PROJECT_DIR$/3MyLinearLayout.iml" />
       <module fileurl="file://$PROJECT_DIR$/Mylinearlayout/Mylinearlayout.iml" filepath="$PROJECT_DIR$/Mylinearlayout/Mylinearlayout.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Testmulttouch/Testmulttouch.iml" filepath="$PROJECT_DIR$/Testmulttouch/Testmulttouch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bannertest/bannertest.iml" filepath="$PROJECT_DIR$/bannertest/bannertest.iml" />
     </modules>
   </component>
 </project>
