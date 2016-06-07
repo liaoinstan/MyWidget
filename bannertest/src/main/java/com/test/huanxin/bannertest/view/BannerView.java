@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/5/30 0030.
  */
-public class Banner extends FrameLayout implements Runnable{
+public class BannerView extends FrameLayout implements Runnable{
 
     private static final String TAG = "Banner";
 
@@ -38,9 +38,8 @@ public class Banner extends FrameLayout implements Runnable{
     private LayoutInflater inflater;
     private TextView text_banner;
     private ViewPager mViewPager;
-    private LinearLayout dot_group;
+    private DotView dotView;
     private BannerAdapter mBannerAdapter;
-    private List<ImageView> mIndicators = new ArrayList<>();
     private List<Images> images;
 
     private int mBannerPosition = 0;
@@ -56,7 +55,7 @@ public class Banner extends FrameLayout implements Runnable{
     private GradientDrawable mSelectedGradientDrawable;
     private int dot_size = 13;
 
-    public Banner(Context context, AttributeSet attrs) {
+    public BannerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -90,25 +89,13 @@ public class Banner extends FrameLayout implements Runnable{
     private void initCtrl() {
         text_banner = (TextView) findViewById(R.id.text_banner);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        dot_group = (LinearLayout) findViewById(R.id.dot_group);
+        dotView = (DotView) findViewById(R.id.dotView);
     }
 
     private void initView() {
-
-        for (int i=0;i<images.size();i++){
-            ImageView imageView = new ImageView(context);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.rightMargin = 10;
-            imageView.setLayoutParams(lp);
-            imageView.setImageDrawable(mUnSelectedGradientDrawable);
-
-            dot_group.addView(imageView);
-            mIndicators.add(imageView);
-        }
-
         mBannerAdapter = new BannerAdapter(context);
         mViewPager.setAdapter(mBannerAdapter);
-        mViewPager.setOnPageChangeListener(mBannerAdapter);
+        mViewPager.addOnPageChangeListener(mBannerAdapter);
         mViewPager.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -123,6 +110,8 @@ public class Banner extends FrameLayout implements Runnable{
                 return false;
             }
         });
+
+        dotView.setViewPager(mViewPager, DEFAULT_BANNER_SIZE);
     }
 
     private Handler mHandler = new Handler(){
@@ -132,18 +121,10 @@ public class Banner extends FrameLayout implements Runnable{
                 int size = mViewPager.getAdapter().getCount();
                 int position = (mViewPager.getCurrentItem() + 1) % size;
                 mViewPager.setCurrentItem(position, true);
-                Banner.this.sendScrollMessage();
+                BannerView.this.sendScrollMessage();
             }
         }
     };
-
-    private void setIndicator(int position) {
-        position %= DEFAULT_BANNER_SIZE;
-        for(ImageView indicator : mIndicators) {
-            indicator.setImageDrawable(mUnSelectedGradientDrawable);
-        }
-        mIndicators.get(position).setImageDrawable(mSelectedGradientDrawable);
-    }
 
     @Override
     public void run() {
@@ -174,20 +155,30 @@ public class Banner extends FrameLayout implements Runnable{
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
+            //计算实际位置
             position %= DEFAULT_BANNER_SIZE;
-            View view = mInflater.inflate(R.layout.item, container, false);
-            ImageView imageView = (ImageView) view.findViewById(R.id.image);
-//            imageView.setImageResource(Integer.parseInt(images.get(position).getImg()));
+
+            //初始化imageView
+            ImageView imageView = new ImageView(context);
+            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            imageView.setLayoutParams(layoutParams);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            //绑定网络图片
             x.image().bind(imageView, images.get(position).getImg(), new CustomBitmapLoadCallBack(imageView));
+
+            //点击事件
             final int pos = position;
-            view.setOnClickListener(new OnClickListener() {
+            imageView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(context, "click banner item :" + pos, Toast.LENGTH_SHORT).show();
                 }
             });
-            container.addView(view);
-            return view;
+
+            //添加到容器
+            container.addView(imageView);
+            return imageView;
         }
 
         @Override
@@ -214,7 +205,7 @@ public class Banner extends FrameLayout implements Runnable{
         @Override
         public void onPageSelected(int position) {
             mBannerPosition = position;
-            setIndicator(position);
+//            setIndicator(position);
             position %= DEFAULT_BANNER_SIZE;
             text_banner.setText(images.get(position).getTitle());
         }

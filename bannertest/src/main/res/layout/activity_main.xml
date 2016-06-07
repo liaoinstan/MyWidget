@@ -21,7 +21,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <com.test.huanxin.bannertest.view.Banner
+    <com.test.huanxin.bannertest.view.BannerView
         android:id="@+id/banner"
         android:layout_width="match_parent"
         android:layout_height="140dp"/>

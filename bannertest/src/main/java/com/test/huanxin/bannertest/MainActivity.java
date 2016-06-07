@@ -1,23 +1,18 @@
 package com.test.huanxin.bannertest;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.test.huanxin.bannertest.entity.Images;
-import com.test.huanxin.bannertest.view.Banner;
+import com.test.huanxin.bannertest.view.BannerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Banner banner;
+    private BannerView banner;
     private List<Images> images = new ArrayList<>();;
 
     @Override
@@ -39,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        banner = (Banner) findViewById(R.id.banner);
+        banner = (BannerView) findViewById(R.id.banner);
 //        banner.showTitle(false);
         banner.setDatas(images);
     }
